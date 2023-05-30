@@ -24,6 +24,7 @@ public:
     }
 
     friend ostream &operator<<(ostream &str, Lz liczba);
+    friend istream &operator>>(istream &str, Lz &ob);
     friend Lz operator+(Lz l1, Lz l2);
     // friend Lz operator*(Lz l1, double s);
     friend Lz operator*(double s, Lz l2);
@@ -67,12 +68,58 @@ Lz operator+(Lz l1, Lz l2)
 //     return Lz(l1.a * s, l1.b * s);
 // }
 
-Lz operator*(double s, Lz l2);
+Lz operator*(double s, Lz l2)
 {
     // double a = l1.a * s;
     // double b = l1.b * s;
     // return Lz(a, b);
     return Lz(s * l2.a, s * l2.b);
+}
+
+istream &operator>>(istream &str, Lz &ob)
+{
+    string s;
+    double a = 0;
+    double b = 0;
+    str >> s;
+    int poz_i = s.find('i');
+    if (poz_i < 0) // nie ma czesci urojonej
+    {
+        a = atof(s.c_str());
+    }
+    else // liczba ma czesc urojona
+    {
+        s = s.substr(0, s.length() - 1); // usuwam litere "i"
+        int poz_plus = s.find('+');
+        int poz_minus = s.find('-');
+        int poz_2_min = s.find('-', 1);
+        if (poz_plus <= 0 && poz_minus <= 0 && poz_2_min < 0) // jest tylko czesc urojona
+        {
+            b = atof(s.c_str());
+        }
+        else // obie czesci
+        {
+            if (poz_plus > 0) // a+bi lub -a+bi
+            {
+                a = atof(s.substr(0, poz_plus).c_str());
+                b = atof(s.substr(poz_plus, s.length() - poz_plus).c_str());
+            }
+            else if(poz_minus >0) //a-bi
+            {
+                a = atof(s.substr(0, poz_minus).c_str());
+                b = atof(s.substr(poz_minus, s.length() - poz_minus).c_str());
+            }
+            else //-a-bi
+            {
+                a = atof(s.substr(0, poz_2_min).c_str());
+                b = atof(s.substr(poz_2_min, s.length() - poz_2_min).c_str());
+            }
+        }
+    }
+
+    ob.a = a;
+    ob.b = b;
+    return str;
 }
 
 Lz tab[9] = {Lz(10, 20), Lz(-10, 20), Lz(10, -20), Lz(-10, -20),
@@ -82,13 +129,12 @@ int main()
 {
     // for (int i = 0; i < 9; i++)
     //     cout << tab[i] << endl;
-    Lz liczba1(10, -45);
-    Lz liczba2(-5, 30);
-    // Lz wynik = liczba1 - liczba2;
-    // cout << liczba1 << " + " << liczba2 << " = " << wynik;
-    // cout << liczba1 << " - " << liczba2 << " = " << liczba1 - liczba2;
-
-    Lz wynik = 3 * liczba1;
-    cout << wynik;
+    Lz test(101, 101);
+    Lz l2(20, -10);
+    cout << "podaj liczbe zespolona: ";
+    cin >> test;
+    cout << "podales: " << test << endl;
+    test = test + l2;
+    cout << "wynik= " << test;
     return 0;
 }
